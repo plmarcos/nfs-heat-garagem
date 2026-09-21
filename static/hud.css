@@ -1,0 +1,1191 @@
+/* HUD no estilo do NFS Heat: painel quase preto, uma borda ciano saturada,
+   magenta como contra-acento raro, e corte diagonal no lugar de canto
+   arredondado. Nenhuma arte do jogo e' copiada -- tudo e' CSS e SVG autoral. */
+
+:root {
+  color-scheme: dark;
+
+  --fundo-0: #06090c;
+  --fundo-1: #0b1116;
+  --fundo-2: #121b22;
+  --fundo-3: #1a262f;
+  --linha: #24343f;
+
+  --texto: #e8f4fa;
+  --texto-2: #8fa6b4;
+  --texto-3: #53697a;
+
+  --ciano: #00e5ff;
+  --ciano-2: #00a5bd;
+  --magenta: #ff2d78;
+  --ambar: #ffb020;
+  --verde: #35e08a;
+  --vermelho: #ff4d4d;
+
+  --vidro: rgba(9, 15, 20, .72);
+  --brilho-ciano: 0 0 18px rgba(0, 229, 255, .45);
+  --curva: cubic-bezier(.2, .7, .2, 1);
+
+  /* Bahnschrift ja' vem no Windows: DIN condensada variavel, exatamente o
+     sabor do HUD do Heat, sem baixar nem licenciar nada. */
+  --fonte-titulo: "Bahnschrift", "Oswald", "Segoe UI Variable Display", Impact, sans-serif;
+  --fonte-texto: "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+  --fonte-numero: "Bahnschrift", "Segoe UI Variable Display", ui-monospace, monospace;
+
+  --topo: 64px;
+  --trilha: 88px;
+  --inspetor: 320px;
+  --carrossel: 172px;
+  --rodape: 38px;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: var(--fundo-0);
+  color: var(--texto);
+  font-family: var(--fonte-texto);
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+}
+
+button, input, select { font: inherit; color: inherit; }
+
+#palco {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  display: block;
+}
+
+#hud {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: var(--trilha) 1fr var(--inspetor);
+  grid-template-rows: var(--topo) 1fr var(--carrossel) var(--rodape);
+  grid-template-areas:
+    "topo  topo  topo"
+    "trilha vazio inspetor"
+    "carrossel carrossel carrossel"
+    "rodape rodape rodape";
+  pointer-events: none;
+}
+
+#hud > * { pointer-events: auto; }
+#hud .vazio { grid-area: vazio; pointer-events: none; }
+
+.oculto { display: none !important; }
+
+/* ---------------------------------------------------------------- topo -- */
+
+.topo {
+  grid-area: topo;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 0 18px;
+  background: linear-gradient(180deg, rgba(6, 9, 12, .96) 55%, rgba(6, 9, 12, .6) 82%, transparent);
+}
+
+.marca { display: flex; align-items: center; gap: 12px; min-width: 0; }
+
+.marca::before {
+  content: "";
+  width: 3px;
+  height: 34px;
+  background: var(--ciano);
+  box-shadow: var(--brilho-ciano);
+}
+
+.marca .rotulo {
+  font-family: var(--fonte-titulo);
+  font-size: 11px;
+  letter-spacing: .22em;
+  color: var(--texto-3);
+  text-transform: uppercase;
+}
+
+.marca .nome {
+  font-family: var(--fonte-titulo);
+  font-size: 21px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.chips { display: flex; gap: 8px; margin-left: auto; }
+
+.chip {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  height: 28px;
+  padding: 0 14px;
+  background: var(--fundo-2);
+  border: 1px solid var(--linha);
+  clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
+  font-family: var(--fonte-titulo);
+  font-size: 10px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--texto-3);
+}
+
+.chip b {
+  font-family: var(--fonte-numero);
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--ciano);
+  letter-spacing: .02em;
+}
+
+.botao {
+  height: 32px;
+  padding: 0 16px;
+  background: transparent;
+  border: 1px solid var(--ciano-2);
+  color: var(--ciano);
+  font-family: var(--fonte-titulo);
+  font-size: 11px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  cursor: pointer;
+  clip-path: polygon(9px 0, 100% 0, calc(100% - 9px) 100%, 0 100%);
+  transition: background .18s var(--curva), color .18s var(--curva);
+}
+
+.botao:hover { background: var(--ciano); color: var(--fundo-0); }
+.botao:focus-visible { outline: 2px solid var(--ciano); outline-offset: 2px; }
+.botao.secundario { border-color: var(--linha); color: var(--texto-2); }
+.botao.secundario:hover { background: var(--fundo-3); color: var(--texto); }
+
+/* ------------------------------------------------------------- trilha -- */
+
+.trilha {
+  grid-area: trilha;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
+  background: linear-gradient(90deg, rgba(6, 9, 12, .985), rgba(9, 14, 18, .95));
+  border-right: 1px solid var(--linha);
+  mask-image: linear-gradient(180deg, transparent 0, #000 22px, #000 calc(100% - 22px), transparent 100%);
+}
+
+.trilha::-webkit-scrollbar { width: 0; }
+
+.aba {
+  position: relative;
+  width: 100%;
+  height: 72px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  background: none;
+  border: 0;
+  border-bottom: 1px solid rgba(36, 52, 63, .5);
+  color: var(--texto-3);
+  cursor: pointer;
+  transition: color .18s var(--curva), background .18s var(--curva);
+}
+
+.aba svg { width: 24px; height: 24px; stroke: currentColor; fill: none; stroke-width: 1.4; }
+
+.aba .nome {
+  font-family: var(--fonte-titulo);
+  font-size: 9px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  text-align: center;
+  line-height: 1.1;
+  padding: 0 3px;
+}
+
+.aba .contagem {
+  position: absolute;
+  top: 9px;
+  right: 11px;
+  font-family: var(--fonte-numero);
+  font-size: 9px;
+  font-variant-numeric: tabular-nums;
+  color: var(--texto-3);
+}
+
+.aba.alterada .contagem { color: var(--ambar); }
+.aba:hover { color: var(--texto-2); background: rgba(255, 255, 255, .03); }
+
+.aba[aria-selected="true"] {
+  color: var(--ciano);
+  background: linear-gradient(90deg, rgba(0, 229, 255, .16), transparent);
+  filter: drop-shadow(0 0 7px rgba(0, 229, 255, .35));
+}
+
+.aba[aria-selected="true"]::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: var(--ciano);
+}
+
+.trilha .divisor {
+  padding: 12px 8px 6px;
+  font-family: var(--fonte-titulo);
+  font-size: 8px;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--texto-3);
+  text-align: center;
+  border-bottom: 1px solid rgba(36, 52, 63, .5);
+}
+
+/* ---------------------------------------------------------- inspetor -- */
+
+.inspetor {
+  grid-area: inspetor;
+  overflow-y: auto;
+  padding: 14px 16px 18px;
+  background: linear-gradient(270deg, rgba(6, 9, 12, .985), rgba(9, 14, 18, .95));
+  border-left: 1px solid var(--linha);
+  scrollbar-width: thin;
+  scrollbar-color: var(--linha) transparent;
+}
+
+.secao { margin-bottom: 20px; }
+
+.secao > h2 {
+  margin: 0 0 10px;
+  font-family: var(--fonte-titulo);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--texto-3);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.secao > h2::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--linha);
+}
+
+.linha-dado {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+  padding: 4px 0;
+  font-size: 12px;
+  color: var(--texto-2);
+}
+
+.linha-dado b {
+  font-family: var(--fonte-numero);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  color: var(--texto);
+}
+
+.ficha { display: grid; gap: 11px; }
+
+.barra .cabeca {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 4px;
+}
+
+.barra .titulo {
+  font-family: var(--fonte-titulo);
+  font-size: 9px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--texto-3);
+}
+
+.barra .valor {
+  font-family: var(--fonte-numero);
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--texto);
+}
+
+.barra .valor .unidade { font-size: 10px; color: var(--texto-3); margin-left: 3px; }
+.barra .valor .delta { font-size: 11px; margin-left: 6px; }
+.barra .valor .delta.sobe { color: var(--ambar); }
+.barra .valor .delta.desce { color: var(--vermelho); }
+
+.barra .calha {
+  position: relative;
+  height: 6px;
+  background: var(--fundo-3);
+  overflow: hidden;
+  clip-path: polygon(3px 0, 100% 0, calc(100% - 3px) 100%, 0 100%);
+}
+
+.barra .preenchimento {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: linear-gradient(90deg, var(--ciano-2), var(--ciano));
+  box-shadow: 0 0 10px rgba(0, 229, 255, .4);
+  transition: width .3s var(--curva);
+}
+
+.barra.geometria .preenchimento {
+  background: linear-gradient(90deg, #3d5361, var(--texto-3));
+  box-shadow: none;
+}
+
+.indisponivel {
+  font-size: 11px;
+  font-style: italic;
+  color: var(--texto-3);
+  padding: 3px 0;
+}
+
+/* --------------------------------------------------------- carrossel -- */
+
+.carrossel {
+  grid-area: carrossel;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(0deg, rgba(6, 9, 12, .985) 74%, rgba(6, 9, 12, .78) 90%, transparent);
+  padding-top: 6px;
+}
+
+.carrossel .cabeca {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 18px 6px;
+}
+
+.carrossel .cabeca h2 {
+  margin: 0;
+  font-family: var(--fonte-titulo);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--texto-2);
+}
+
+.carrossel .contador {
+  font-family: var(--fonte-numero);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  color: var(--texto-3);
+  margin-left: auto;
+}
+
+.trilho {
+  position: relative;
+  display: flex;
+  gap: 10px;
+  padding: 2px 18px 10px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  mask-image: linear-gradient(90deg, transparent 0, #000 18px, #000 calc(100% - 18px), transparent 100%);
+}
+
+.trilho::-webkit-scrollbar { height: 0; }
+
+.cartao {
+  position: relative;
+  flex: 0 0 auto;
+  width: 200px;
+  height: 130px;
+  scroll-snap-align: center;
+  background: var(--fundo-2);
+  border: 1px solid var(--linha);
+  color: var(--texto-2);
+  cursor: pointer;
+  padding: 0;
+  overflow: hidden;
+  clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
+  transition: border-color .18s var(--curva), box-shadow .18s var(--curva),
+              transform .18s var(--curva);
+}
+
+.cartao:hover { transform: translateY(-2px); border-color: #3a5464; }
+.cartao:focus-visible { outline: 2px solid var(--ciano); outline-offset: 2px; }
+
+.cartao .arte {
+  height: 92px;
+  width: 100%;
+  display: block;
+  object-fit: cover;
+  background: radial-gradient(circle at 50% 42%, #1b2831, #0a1015 72%);
+}
+
+.cartao .faixa {
+  height: 38px;
+  padding: 5px 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1px;
+  text-align: left;
+}
+
+.cartao .titulo {
+  font-family: var(--fonte-titulo);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--texto);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cartao .codigo {
+  font-family: var(--fonte-numero);
+  font-size: 9px;
+  letter-spacing: .08em;
+  color: var(--texto-3);
+}
+
+.cartao[aria-pressed="true"] {
+  border: 2px solid var(--ciano);
+  box-shadow: var(--brilho-ciano);
+}
+
+.cartao[aria-pressed="true"] .faixa {
+  background: linear-gradient(90deg, rgba(0, 229, 255, .22), transparent);
+}
+
+.cartao[aria-pressed="true"]::after {
+  content: "";
+  position: absolute;
+  top: 0; left: 50%;
+  transform: translateX(-50%);
+  border-left: 7px solid transparent;
+  border-right: 7px solid transparent;
+  border-top: 7px solid var(--ciano);
+}
+
+.cartao.equipada:not([aria-pressed="true"])::before {
+  content: "";
+  position: absolute;
+  top: 8px; right: 8px;
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--ciano);
+  box-shadow: var(--brilho-ciano);
+}
+
+.cartao.carregando .arte {
+  background: linear-gradient(100deg, #101a21 30%, rgba(0, 229, 255, .10) 50%, #101a21 70%);
+  background-size: 260% 100%;
+  animation: varredura 1.2s linear infinite;
+}
+
+@keyframes varredura {
+  from { background-position: 130% 0; }
+  to { background-position: -30% 0; }
+}
+
+.cartao.original .arte {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cartao.original .arte svg {
+  width: 34px; height: 34px;
+  stroke: var(--ciano-2);
+  fill: none;
+  stroke-width: 1.2;
+}
+
+/* ------------------------------------------------------------ rodape -- */
+
+.rodape {
+  grid-area: rodape;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 18px;
+  background: var(--fundo-0);
+  border-top: 1px solid var(--linha);
+  font-size: 11px;
+  color: var(--texto-3);
+}
+
+.rodape kbd {
+  font-family: var(--fonte-numero);
+  font-size: 10px;
+  padding: 2px 6px;
+  background: var(--fundo-2);
+  border: 1px solid var(--linha);
+  color: var(--texto-2);
+  margin-right: 5px;
+}
+
+.rodape .estado { margin-left: auto; font-variant-numeric: tabular-nums; }
+
+/* -------------------------------------------------------------- aviso -- */
+
+#aviso {
+  position: fixed;
+  left: 50%;
+  bottom: calc(var(--carrossel) + var(--rodape) + 16px);
+  transform: translateX(-50%);
+  z-index: 5;
+  max-width: 460px;
+  padding: 11px 18px;
+  background: var(--vidro);
+  border: 1px solid var(--magenta);
+  clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
+  font-size: 12px;
+  color: var(--texto);
+  opacity: 0;
+  transition: opacity .2s var(--curva);
+  pointer-events: none;
+}
+
+#aviso.visivel { opacity: 1; }
+
+/* ------------------------------------------------------------ abertura -- */
+
+#abertura {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 18px;
+  background: var(--fundo-0);
+  transition: opacity .4s var(--curva);
+}
+
+#abertura.saindo { opacity: 0; pointer-events: none; }
+
+#abertura h1 {
+  margin: 0;
+  font-family: var(--fonte-titulo);
+  font-size: 34px;
+  font-weight: 600;
+  letter-spacing: .3em;
+  text-transform: uppercase;
+}
+
+#abertura .sub {
+  font-family: var(--fonte-titulo);
+  font-size: 11px;
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  color: var(--texto-3);
+}
+
+#abertura .barra-carga {
+  width: 260px;
+  height: 2px;
+  background: var(--fundo-3);
+  overflow: hidden;
+}
+
+#abertura .barra-carga i {
+  display: block;
+  height: 100%;
+  width: 40%;
+  background: var(--ciano);
+  box-shadow: var(--brilho-ciano);
+  animation: deslizar 1.1s var(--curva) infinite;
+}
+
+@keyframes deslizar {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(350%); }
+}
+
+#abertura .mensagem { font-size: 12px; color: var(--texto-2); min-height: 1.2em; }
+
+/* --------------------------------------------------------- seletor --- */
+
+#seletor {
+  position: fixed;
+  inset: 0;
+  z-index: 8;
+  display: none;
+  grid-template-rows: auto 1fr;
+  background: rgba(6, 9, 12, .96);
+}
+
+#seletor.aberto { display: grid; }
+
+#seletor .cabeca {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 24px;
+  border-bottom: 1px solid var(--linha);
+}
+
+#seletor h2 {
+  margin: 0;
+  font-family: var(--fonte-titulo);
+  font-size: 15px;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+}
+
+#busca {
+  flex: 1;
+  max-width: 420px;
+  height: 34px;
+  padding: 0 12px;
+  background: var(--fundo-2);
+  border: 1px solid var(--linha);
+  color: var(--texto);
+}
+
+#busca:focus { outline: none; border-color: var(--ciano); }
+
+#lista-carros {
+  overflow-y: auto;
+  padding: 18px 24px 30px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 10px;
+  align-content: start;
+}
+
+.item-carro {
+  text-align: left;
+  padding: 11px 14px;
+  background: var(--fundo-1);
+  border: 1px solid var(--linha);
+  color: var(--texto-2);
+  cursor: pointer;
+  clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+  transition: border-color .15s var(--curva), background .15s var(--curva);
+}
+
+.item-carro:hover { border-color: var(--ciano-2); background: var(--fundo-2); }
+.item-carro:focus-visible { outline: 2px solid var(--ciano); outline-offset: 2px; }
+.item-carro[aria-current="true"] { border-color: var(--ciano); color: var(--texto); }
+
+.item-carro .nome {
+  display: block;
+  font-family: var(--fonte-titulo);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  color: var(--texto);
+}
+
+.item-carro .meta {
+  display: block;
+  margin-top: 2px;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  color: var(--texto-3);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+  }
+}
+
+/* --------------------------------------------------------- pintura ----- */
+
+.bloco-pintura {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding: 6px 14px 6px 0;
+  margin-right: 6px;
+  border-right: 1px solid var(--linha);
+}
+
+.rotulo-bloco {
+  font-family: var(--fonte-titulo);
+  font-size: 9px;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--texto-3);
+}
+
+.paleta {
+  display: grid;
+  grid-template-columns: repeat(9, 30px);
+  grid-auto-rows: 30px;
+  gap: 5px;
+}
+
+.amostra {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 1px solid var(--linha);
+  background: var(--cor, #888);
+  cursor: pointer;
+  clip-path: polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%);
+  transition: transform .15s var(--curva), box-shadow .15s var(--curva);
+}
+
+.amostra:hover { transform: translateY(-2px); }
+.amostra:focus-visible { outline: 2px solid var(--ciano); outline-offset: 2px; }
+
+.amostra[aria-pressed="true"] {
+  border-color: var(--ciano);
+  box-shadow: var(--brilho-ciano), inset 0 0 0 2px rgba(6, 9, 12, .8);
+}
+
+.amostra.livre {
+  display: grid;
+  place-items: center;
+  background: var(--fundo-3);
+  overflow: hidden;
+}
+
+.amostra.livre input {
+  width: 46px;
+  height: 46px;
+  border: 0;
+  padding: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.cartao.acabamento .arte { height: 92px; }
+
+.amostra-acabamento {
+  background:
+    radial-gradient(circle at 34% 26%, rgba(255, 255, 255, .55), transparent 42%),
+    radial-gradient(circle at 70% 78%, rgba(0, 229, 255, .18), transparent 48%),
+    var(--cor);
+}
+
+.amostra-acabamento[data-acab="fosco"],
+.amostra-acabamento[data-acab="fosco-metalico"] {
+  background:
+    radial-gradient(circle at 34% 26%, rgba(255, 255, 255, .10), transparent 60%),
+    var(--cor);
+}
+
+.amostra-acabamento[data-acab="cromado"] {
+  background: linear-gradient(160deg, #eef3f7 0 28%, #6c7b88 38% 52%, #dfe7ee 60% 74%, #46525c 100%);
+}
+
+.amostra-acabamento[data-acab="perolizado"] {
+  background:
+    linear-gradient(120deg, rgba(255, 210, 255, .35), rgba(180, 240, 255, .30) 55%, transparent 80%),
+    radial-gradient(circle at 34% 26%, rgba(255, 255, 255, .5), transparent 46%),
+    var(--cor);
+}
+
+.amostra-acabamento[data-acab="cor-shift"] {
+  background:
+    linear-gradient(115deg, #7a3cff 0 22%, #2ad4ff 42%, #35e08a 62%, #ffb020 82%, #ff2d78 100%);
+}
+
+.cartao.sem-miniatura .arte::after {
+  content: "sem prévia";
+  display: grid;
+  place-items: center;
+  height: 100%;
+  font-family: var(--fonte-titulo);
+  font-size: 9px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--texto-3);
+}
+
+#abertura .mensagem.erro {
+  color: var(--magenta);
+  max-width: 560px;
+  text-align: center;
+  line-height: 1.5;
+}
+
+/* ------------------------------------------------- ficha técnica ------- */
+
+.barra .detalhe {
+  margin-top: 3px;
+  font-size: 10px;
+  color: var(--texto-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.procedencia {
+  margin: 10px 0 0;
+  font-size: 10px;
+  line-height: 1.5;
+  color: var(--texto-3);
+}
+
+.procedencia code {
+  font-family: var(--fonte-numero);
+  font-size: 10px;
+  color: var(--texto-2);
+  word-break: break-all;
+}
+
+#curva { margin-top: 10px; }
+
+.curva { width: 100%; height: auto; display: block; }
+.curva .eixo {
+  font-family: var(--fonte-numero);
+  font-size: 9px;
+  fill: var(--texto-3);
+}
+
+/* ------------------------------------------------------- aviso pausado -- */
+/* Mostrado a cada abertura, depois que a tela de carga sai. Fica acima do
+   `#abertura` (z-index 10) porque os dois coexistem por ~450 ms enquanto a
+   abertura desaparece. */
+
+#pausado {
+  position: fixed;
+  inset: 0;
+  z-index: 11;
+  /* Flex, nao grid: com `place-content: center` a trilha implicita e dimensionada
+     pelo max-content do painel, e quando esse max-content passa da largura util o
+     navegador descarta a centralizacao e ancora na borda. Foi o que aconteceu com
+     a tela de boas-vindas, que tem paragrafo longo. */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(3, 6, 9, .78);
+  backdrop-filter: blur(3px);
+  opacity: 0;
+  transition: opacity .22s var(--curva);
+}
+
+#pausado[hidden] { display: none; }
+#pausado.visivel { opacity: 1; }
+
+#pausado .painel {
+  position: relative;
+  width: min(560px, 100%);
+  padding: 26px 30px 24px;
+  background: var(--fundo-1);
+  border: 1px solid var(--ciano-2);
+  box-shadow: var(--brilho-ciano);
+  /* Corte diagonal no lugar de canto arredondado, como o resto do HUD. */
+  clip-path: polygon(16px 0, 100% 0, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0 100%, 0 16px);
+  transform: translateY(8px);
+  transition: transform .22s var(--curva);
+}
+
+#pausado.visivel .painel { transform: none; }
+
+#pausado .faixa {
+  font-family: var(--fonte-titulo);
+  font-size: 10px;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--ciano);
+  margin-bottom: 14px;
+}
+
+#pausado .faixa span,
+#pausado .botao span { color: var(--texto-3); margin: 0 4px; }
+
+#pausado h2 {
+  margin: 0 0 12px;
+  font-family: var(--fonte-titulo);
+  font-size: 26px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--texto);
+}
+
+
+#pausado p {
+  margin: 0 0 10px;
+  font-size: 13px;
+  line-height: 1.65;
+  color: var(--texto-2);
+}
+
+#pausado p b { color: var(--texto); font-weight: 600; }
+
+#pausado .nota {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid var(--linha);
+  font-size: 10px;
+  line-height: 1.7;
+  letter-spacing: .04em;
+  color: var(--texto-3);
+}
+
+#pausado .nota code {
+  font-family: var(--fonte-numero);
+  font-size: 10px;
+  color: var(--texto-2);
+}
+
+/* Largura propria, nao 100%: o `clip-path` do `.botao` corta 9 px em diagonal,
+   e esticado na largura do painel o corte engole a borda lateral inteira -- sobra
+   so' a linha de cima e a de baixo, que parece defeito. */
+#pausado .botao {
+  display: block;
+  margin: 22px auto 0;
+  min-width: 240px;
+  height: 38px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #pausado,
+  #pausado .painel { transition: none; }
+  #pausado .painel { transform: none; }
+}
+
+/* ------------------------------------------------------------- idioma -- */
+/* O `<i>` existe so' para marcar o pedaco traduzivel dentro de um elemento que
+   tambem tem numero ou tecla (chip, atalho). Nao e' enfase -- tira o italico. */
+.chip i,
+.rodape i { font-style: normal; }
+
+/* A escolha de idioma reaproveita o painel do aviso de pausa: mesma moldura,
+   mesmo corte diagonal, mesma entrada. So' o miolo muda. */
+#escolha-idioma {
+  position: fixed;
+  inset: 0;
+  z-index: 12;            /* acima do aviso de pausa, que so' vem depois */
+  /* Flex, nao grid: com `place-content: center` a trilha implicita e dimensionada
+     pelo max-content do painel, e quando esse max-content passa da largura util o
+     navegador descarta a centralizacao e ancora na borda. Foi o que aconteceu com
+     a tela de boas-vindas, que tem paragrafo longo. */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(3, 6, 9, .88);
+  backdrop-filter: blur(3px);
+  opacity: 0;
+  transition: opacity .22s var(--curva);
+}
+
+#escolha-idioma[hidden] { display: none; }
+#escolha-idioma.visivel { opacity: 1; }
+
+#escolha-idioma .painel {
+  width: min(420px, 100%);
+  padding: 26px 30px 24px;
+  background: var(--fundo-1);
+  border: 1px solid var(--ciano-2);
+  box-shadow: var(--brilho-ciano);
+  clip-path: polygon(16px 0, 100% 0, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0 100%, 0 16px);
+  transform: translateY(8px);
+  transition: transform .22s var(--curva);
+}
+
+#escolha-idioma.visivel .painel { transform: none; }
+
+#escolha-idioma .faixa {
+  font-family: var(--fonte-titulo);
+  font-size: 10px;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--ciano);
+  margin-bottom: 14px;
+}
+
+#escolha-idioma h2 {
+  margin: 0 0 14px;
+  font-family: var(--fonte-titulo);
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--texto);
+}
+
+#escolha-idioma h2 span { color: var(--texto-3); margin: 0 6px; }
+
+#escolha-idioma p {
+  margin: 0 0 6px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--texto-2);
+}
+
+#escolha-idioma .en { color: var(--texto-3); }
+
+#escolha-idioma .opcoes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+#escolha-idioma .opcoes .botao { height: 40px; font-size: 12px; }
+
+/* Alternador no rodape: dois botoes minusculos, o ativo em ciano. Fica aqui
+   porque o rodape ja' e' a faixa de "como mexer" -- e porque uma escolha feita
+   uma vez na vida nao merece ocupar area nobre da tela. */
+.rodape .idioma {
+  display: inline-flex;
+  gap: 1px;
+  margin-left: 12px;
+  border: 1px solid var(--linha);
+}
+
+.rodape .idioma button {
+  padding: 2px 7px;
+  background: transparent;
+  border: 0;
+  font-family: var(--fonte-numero);
+  font-size: 10px;
+  letter-spacing: .08em;
+  color: var(--texto-3);
+  cursor: pointer;
+}
+
+.rodape .idioma button:hover { color: var(--texto-2); background: var(--fundo-2); }
+.rodape .idioma button[aria-pressed="true"] { color: var(--fundo-0); background: var(--ciano); }
+.rodape .idioma button:focus-visible { outline: 2px solid var(--ciano); outline-offset: 1px; }
+
+@media (prefers-reduced-motion: reduce) {
+  #escolha-idioma,
+  #escolha-idioma .painel { transition: none; }
+  #escolha-idioma .painel { transform: none; }
+}
+
+/* -------------------------------------------------- falta o acervo -- */
+/* Mesma moldura do aviso de pausa e do seletor de idioma. E' a primeira tela
+   de quem baixou so' o programa, entao ela explica antes de pedir qualquer
+   coisa -- e nao oferece nenhum caminho que dependa de asset de terceiro. */
+
+#sem-acervo {
+  position: fixed;
+  inset: 0;
+  z-index: 13;
+  /* Flex, nao grid: com `place-content: center` a trilha implicita e dimensionada
+     pelo max-content do painel, e quando esse max-content passa da largura util o
+     navegador descarta a centralizacao e ancora na borda. Foi o que aconteceu com
+     a tela de boas-vindas, que tem paragrafo longo. */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  overflow: auto;
+  background: var(--fundo-0);
+}
+
+#sem-acervo[hidden] { display: none; }
+
+#sem-acervo .painel {
+  width: min(600px, 100%);
+  padding: 28px 32px 26px;
+  background: var(--fundo-1);
+  border: 1px solid var(--ciano-2);
+  box-shadow: var(--brilho-ciano);
+  clip-path: polygon(16px 0, 100% 0, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0 100%, 0 16px);
+}
+
+#sem-acervo .faixa {
+  font-family: var(--fonte-titulo);
+  font-size: 10px;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--ambar);
+  margin-bottom: 14px;
+}
+
+#sem-acervo h2 {
+  margin: 0 0 14px;
+  font-family: var(--fonte-titulo);
+  font-size: 26px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--texto);
+}
+
+#sem-acervo h3 {
+  margin: 26px 0 10px;
+  padding-top: 18px;
+  border-top: 1px solid var(--linha);
+  font-family: var(--fonte-titulo);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--texto-2);
+}
+
+#sem-acervo p {
+  margin: 0 0 10px;
+  font-size: 13px;
+  line-height: 1.65;
+  color: var(--texto-2);
+}
+
+#sem-acervo p b { color: var(--texto); font-weight: 600; }
+#sem-acervo code {
+  font-family: var(--fonte-numero);
+  font-size: 12px;
+  padding: 1px 5px;
+  background: var(--fundo-2);
+  border: 1px solid var(--linha);
+  color: var(--texto-2);
+}
+
+#sem-acervo .acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+#sem-acervo .acoes .botao {
+  height: 40px;
+  flex: 1 1 200px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+#sem-acervo .nota {
+  margin-top: 22px;
+  padding-top: 14px;
+  border-top: 1px solid var(--linha);
+  font-size: 10px;
+  line-height: 1.7;
+  color: var(--texto-3);
+}
+
+/* Recado de erro da tela de boas-vindas: a pasta escolhida nao servia. Magenta,
+   nao vermelho -- vermelho no HUD esta' reservado para zona de giro. */
+#sem-acervo .erro {
+  margin-top: 14px;
+  padding: 10px 14px;
+  background: rgba(255, 45, 120, .08);
+  border-left: 2px solid var(--magenta);
+  font-size: 12px;
+  color: var(--texto);
+}

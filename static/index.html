@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title data-i18n-titulo="app.titulo">Garagem NFS Heat</title>
+<link rel="stylesheet" href="/static/hud.css">
+<script type="importmap">
+{"imports": {"three": "/static/three/three.module.js"}}
+</script>
+</head>
+<body>
+
+<canvas id="palco"></canvas>
+
+<div id="hud" class="oculto">
+
+  <header class="topo">
+    <div class="marca">
+      <div>
+        <div class="rotulo" data-i18n="topo.marca">Garagem</div>
+        <div class="nome" id="nome-carro">—</div>
+      </div>
+    </div>
+    <div class="chips">
+      <span class="chip"><i data-i18n="topo.pecas">Peças</i> <b id="chip-pecas">0/0</b></span>
+      <span class="chip"><i data-i18n="topo.triangulos">Triângulos</i> <b id="chip-tris">0</b></span>
+      <span class="chip"><i data-i18n="topo.fps">FPS</i> <b id="chip-fps">—</b></span>
+    </div>
+    <button class="botao" id="btn-trocar" data-i18n="topo.trocar">Trocar veículo</button>
+  </header>
+
+  <nav class="trilha" id="trilha" data-i18n-attr="aria-label:trilha.rotulo"
+       aria-label="Categorias de peça"></nav>
+
+  <div class="vazio"></div>
+
+  <aside class="inspetor" id="inspetor">
+    <section class="secao">
+      <h2 data-i18n="inspetor.ficha">Ficha técnica</h2>
+      <div class="ficha" id="ficha"></div>
+      <div id="curva"></div>
+    </section>
+    <section class="secao">
+      <h2 data-i18n="inspetor.mecanica">Mecânica</h2>
+      <div id="mecanica"></div>
+    </section>
+    <section class="secao">
+      <h2 data-i18n="inspetor.peca">Peça</h2>
+      <div id="detalhe-peca"><p class="indisponivel" data-i18n="inspetor.escolhaCategoria">Escolha uma categoria.</p></div>
+    </section>
+    <section class="secao">
+      <h2 data-i18n="inspetor.rodas">Rodas</h2>
+      <div id="detalhe-rodas"></div>
+    </section>
+  </aside>
+
+  <section class="carrossel">
+    <div class="cabeca">
+      <h2 id="titulo-carrossel" data-i18n="carrossel.titulo">Peças</h2>
+      <span class="contador" id="contador-carrossel"></span>
+    </div>
+    <div class="trilho" id="trilho" role="listbox"
+         data-i18n-attr="aria-label:carrossel.rotulo" aria-label="Variantes da peça"></div>
+  </section>
+
+  <footer class="rodape">
+    <span><kbd data-i18n="atalho.arrastar">Arrastar</kbd><i data-i18n="atalho.girar">girar</i></span>
+    <span><kbd data-i18n="atalho.roda">Roda</kbd><i data-i18n="atalho.aproximar">aproximar</i></span>
+    <span><kbd>↑ ↓</kbd><i data-i18n="atalho.categoria">categoria</i></span>
+    <span><kbd>← →</kbd><i data-i18n="atalho.peca">peça</i></span>
+    <span><kbd>R</kbd><i data-i18n="atalho.recentrar">recentrar</i></span>
+    <span class="estado" id="estado" data-i18n="estado.pronto">pronto</span>
+    <span class="idioma" id="alternar-idioma" role="group"
+          data-i18n-attr="aria-label:rodape.idioma" aria-label="Idioma da interface"></span>
+  </footer>
+
+</div>
+
+<div id="aviso" role="status" aria-live="polite"></div>
+
+<div id="seletor" aria-hidden="true">
+  <div class="cabeca">
+    <h2 data-i18n="seletor.titulo">Escolher veículo</h2>
+    <input id="busca" type="search" data-i18n-attr="placeholder:seletor.busca"
+           placeholder="Buscar por marca, modelo ou ano" autocomplete="off">
+    <button class="botao secundario" id="btn-fechar-seletor" data-i18n="seletor.fechar">Fechar</button>
+  </div>
+  <div id="lista-carros"></div>
+</div>
+
+<div id="abertura">
+  <h1 data-i18n="topo.marca">Garagem</h1>
+  <div class="sub">Need for Speed Heat</div>
+  <div class="barra-carga"><i></i></div>
+  <div class="mensagem" id="mensagem-abertura" data-i18n="abertura.iniciando">iniciando…</div>
+</div>
+
+<!-- Boas-vindas de quem ainda nao tem os arquivos. O programa e' distribuido
+     **sem** os modelos, que sao da Electronic Arts, entao esta tela e' o primeiro
+     contato de muita gente com o projeto. -->
+<div id="sem-acervo" hidden>
+  <div class="painel">
+    <div class="faixa" data-i18n="semAcervo.faixa">Falta o acervo</div>
+    <h2 data-i18n="semAcervo.titulo">Os modelos não vêm junto</h2>
+    <p data-i18n-html="semAcervo.corpoHtml">O programa é só o código.</p>
+
+    <div class="acoes" id="links-acervo"></div>
+
+    <h3 data-i18n="semAcervo.jaTenho">Já tenho os arquivos</h3>
+    <p data-i18n-html="semAcervo.comoCarregarHtml">Aponte a pasta.</p>
+
+    <p class="nota" data-i18n="semAcervo.nota">Material do jogo é da Electronic Arts.</p>
+  </div>
+</div>
+
+<!-- Escolha de idioma, so' na primeira abertura. E' a unica tela do app que fica
+     nas duas linguas para sempre: perguntar "qual idioma?" num idioma que a
+     pessoa talvez nao leia nao resolve nada. -->
+<div id="escolha-idioma" role="dialog" aria-modal="true" aria-labelledby="idioma-titulo" hidden>
+  <div class="painel">
+    <div class="faixa">Garagem NFS Heat</div>
+    <h2 id="idioma-titulo">Idioma <span>·</span> Language</h2>
+    <p lang="pt-BR">Escolha o idioma da interface. Dá para trocar depois, no rodapé.</p>
+    <p class="en" lang="en">Choose the interface language. You can change it later, in the footer.</p>
+    <div class="opcoes">
+      <button class="botao" type="button" data-idioma="pt" lang="pt-BR">Português</button>
+      <button class="botao" type="button" data-idioma="en" lang="en">English</button>
+    </div>
+  </div>
+</div>
+
+<!-- Aviso de estado do projeto, mostrado a cada abertura. -->
+<div id="pausado" role="dialog" aria-modal="true" aria-labelledby="pausado-titulo" hidden>
+  <div class="painel">
+    <div class="faixa" data-i18n="pausado.faixa">Aviso do projeto</div>
+    <h2 id="pausado-titulo" data-i18n="pausado.titulo">Trabalho pausado</h2>
+    <p data-i18n-html="pausado.corpoHtml">O desenvolvimento desta garagem está pausado.</p>
+    <p class="nota" data-i18n-html="pausado.notaHtml">Código sob licença MIT.</p>
+    <button class="botao" id="btn-pausado" type="button" data-i18n="pausado.botao">Entendi</button>
+  </div>
+</div>
+
+<script type="module" src="/static/app.mjs"></script>
+</body>
+</html>

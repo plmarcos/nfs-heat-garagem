@@ -1,0 +1,40 @@
+# Nada de dado de jogo neste repositorio. Os padroes vao SEM barra inicial de
+# proposito: com barra eles ancoram na raiz e deixam passar qualquer subpasta --
+# foi assim que 2,32 GB de asset entraram no repositorio antigo do projeto.
+*.obj
+*.mtl
+*.fbx
+*.png
+*.jpg
+*.jpeg
+*.dds
+*.tga
+*.key
+*.dll
+*.csv
+*.7z
+*.zip
+ASSETS/
+FilesGame/
+CarsNfSHeat/
+out/
+cache/
+
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+build/
+dist/
+*.spec
+
+*.log
+servidor.log
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Excecoes: o Three.js embarcado e' codigo, nao dado de jogo.
+!static/three/*.js

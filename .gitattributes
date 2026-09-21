@@ -1,0 +1,16 @@
+# Fim de linha normalizado no repositorio, para o diff nao encher de ruido em
+# quem clonar no Linux ou no macOS. O `.bat` e' a excecao obrigatoria: o cmd.exe
+# do Windows precisa de CRLF para ler o arquivo direito.
+* text=auto eol=lf
+
+*.bat text eol=crlf
+*.ps1 text eol=crlf
+
+# Codigo de terceiro embarcado: fora da contagem de linguagem do GitHub, para a
+# barra do repositorio nao dizer que isto aqui e' um projeto de 80% JavaScript
+# por causa do Three.js.
+static/three/* linguist-vendored
+
+*.png binary
+*.jpg binary
+*.obj binary
