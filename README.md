@@ -302,6 +302,20 @@ pasta) — aí precisa voltar por um caminho que não trave, provavelmente
 
 O `Garagem.bat` cai para o navegador se a janela não subir.
 
+## De onde vem o acervo
+
+Os modelos não acompanham este repositório — saem da sua própria cópia do jogo,
+com as ferramentas de
+**[nfs-heat-car-tools](https://github.com/plmarcos/nfs-heat-car-tools)**.
+
+O guia de uso dos arquivos extraídos — eixos, unidade, canais de textura,
+remontagem, a regra da roda — está em
+**[ASSETS.md](https://github.com/plmarcos/nfs-heat-car-tools/blob/main/ASSETS.md)**.
+
+A garagem aceita **qualquer pasta** como raiz, desde que ela tenha
+`_indice.csv`, `_mods_indice.csv`, `_mods_mapa.csv`, `_rodas_eixos.csv`,
+`_ficha_tecnica.csv` e a pasta `_pneu/`.
+
 ## Idioma
 
 Na **primeira abertura** o app pergunta o idioma, em português e em inglês — é a

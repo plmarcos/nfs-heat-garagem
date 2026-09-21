@@ -310,6 +310,21 @@ needed.
 
 `Garagem.bat` falls back to the browser if the window does not come up.
 
+## Where the library comes from
+
+The models do not ship with this repository — they come out of your own copy of
+the game, using the tools in
+**[nfs-heat-car-tools](https://github.com/plmarcos/nfs-heat-car-tools)**.
+
+The guide to using the extracted files — axes, units, texture channels,
+reassembly, the wheel rule — is in
+**[ASSETS.md](https://github.com/plmarcos/nfs-heat-car-tools/blob/main/ASSETS.md)**
+(in Portuguese).
+
+The garage accepts **any folder** as its root, as long as it has `_indice.csv`,
+`_mods_indice.csv`, `_mods_mapa.csv`, `_rodas_eixos.csv`, `_ficha_tecnica.csv`
+and the `_pneu/` folder.
+
 ## Language
 
 On **first open** the app asks for the language, in Portuguese and in English — it
