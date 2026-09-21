@@ -290,4 +290,5 @@ registrar({
                          en: 'Code under the MIT license · <code>README.md</code> · '
                            + '<code>README.en.md</code><br>No game files ship with the project.' },
   'pausado.botao':  { pt: 'Entendi', en: 'Got it' },
+  'pausado.baixar': { pt: 'Baixar os modelos', en: 'Download the models' },
 });

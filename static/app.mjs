@@ -258,9 +258,28 @@ function mostrarSemAcervo(links) {
 // mexer. Por isso aparece **sempre**, sem "nao mostrar de novo" -- quem abre o
 // app pela primeira vez daqui a um ano precisa da mesma informacao que quem
 // abriu ontem. E por isso sai facil: botao, Esc, ou clique no fundo.
+// O botao de download entra a partir do link que o servidor manda (`config.py`).
+// Link vazio = nenhum botao: quem nao publicou acervo nenhum nao ganha um botao
+// que leva a lugar nenhum.
+function montarBotaoDeDownload() {
+  const caixa = $('pausado')?.querySelector('.acoes');
+  const url = estado.acervo?.links?.proprio;
+  const antigo = caixa?.querySelector('a.baixar');
+  if (antigo) antigo.remove();
+  if (!caixa || !url) return;
+  const a = document.createElement('a');
+  a.className = 'botao secundario baixar';
+  a.href = url;
+  a.target = '_blank';
+  a.rel = 'noopener noreferrer';
+  a.textContent = t('pausado.baixar');
+  caixa.appendChild(a);
+}
+
 function mostrarAvisoPausado() {
   const el = $('pausado');
   if (!el) return;
+  montarBotaoDeDownload();
   const focoAnterior = document.activeElement;
   const botao = $('btn-pausado');
 

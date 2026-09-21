@@ -1,4 +1,4 @@
-﻿"""Onde fica o acervo e o que o app lembra entre uma sessao e outra.
+"""Onde fica o acervo e o que o app lembra entre uma sessao e outra.
 
 A raiz do acervo e' configuracao, nunca constante: os scripts que geraram esses
 arquivos trazem caminho da maquina do autor embutido, e este app nao repete isso.
@@ -21,7 +21,14 @@ PADRAO_ACERVO = Path("F:/CarsNfSHeat")
 # asset extraido do jogo e' decisao de quem publica, nao deste programa.
 LINKS_DOS_ARQUIVOS = {
     "ferramentas": "https://github.com/plmarcos/nfs-heat-car-tools",
-    "proprio": "",
+    # Pasta no Google Drive com o acervo empacotado, em volumes de 1 GB.
+    #
+    # ATENCAO, para quem for trocar este endereco: o link **so' funciona para
+    # quem tem acesso a pasta**. Deixar uma pasta com material do jogo acessivel
+    # por link e' decisao (e risco) de quem publica -- este programa nao muda
+    # compartilhamento de nada, so' mostra o endereco que estiver escrito aqui.
+    # Para nao oferecer nenhum download, deixe vazio: o botao some sozinho.
+    "proprio": "https://drive.google.com/drive/folders/1qZQazb2tJdHfCsHzsVxzLdOqvyIg-c8Z",
 }
 
 

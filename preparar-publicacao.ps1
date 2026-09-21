@@ -33,7 +33,9 @@ foreach ($a in $alvos) {
     $txt = Get-Content -Raw -Encoding utf8 $a
     $novo = $txt -replace 'SEU-USUARIO', $Usuario
     if ($novo -ne $txt) {
-        Set-Content -Path $a -Value $novo -Encoding utf8 -NoNewline
+        # NAO usar `Set-Content -Encoding utf8`: no PowerShell 5.1 isso escreve
+        # BOM, e um BOM no LICENSE atrapalha a deteccao de licenca do GitHub.
+        [System.IO.File]::WriteAllText((Resolve-Path $a), $novo, (New-Object System.Text.UTF8Encoding $false))
         Write-Output "preenchido: $a"
     }
 }

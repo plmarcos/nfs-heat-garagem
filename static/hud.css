@@ -1189,3 +1189,23 @@ button, input, select { font: inherit; color: inherit; }
   font-size: 12px;
   color: var(--texto);
 }
+
+/* Os botoes do aviso de abertura ficam lado a lado: "Entendi" e, quando ha'
+   endereco publicado, "Baixar os modelos". Em tela estreita empilham. */
+#pausado .acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 22px;
+}
+
+#pausado .acoes .botao {
+  flex: 1 1 200px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 38px;
+  text-decoration: none;
+  margin: 0;
+  min-width: 0;
+}

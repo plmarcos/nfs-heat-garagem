@@ -325,7 +325,7 @@ def build_handler(app: App):
                     return self._json({"semAcervo": True,
                                        "links": LINKS_DOS_ARQUIVOS,
                                        "versao": VERSAO_CONVERSOR})
-                return self._json(ac.resumo())
+                return self._json({**ac.resumo(), "links": LINKS_DOS_ARQUIVOS})
 
             if ac is None:
                 return self._erro(503, "sem acervo: escolha a pasta dos arquivos")
