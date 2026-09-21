@@ -18,12 +18,28 @@
 # Entao torque(rpm) = yMin + (yMax - yMin) * curva(t), com t = (rpm-xMin)/(xMax-xMin).
 
 param(
-  [string]$Jogo    = 'F:\SteamLibrary\steamapps\common\Need for Speed Heat',
-  [string]$Frosty  = 'F:\SteamLibrary\steamapps\common\NFS Heat Music Modding\FrostyEditor\FrostyEditor',
-  [string]$Acervo  = 'F:\CarsNfSHeat',
-  [string]$Export  = 'F:\CarsNfSHeat\_ferramentas\Export.cs'
+  [string]$Jogo    = $(if ($env:NFSHEAT_JOGO) { $env:NFSHEAT_JOGO }
+                       else { 'F:\SteamLibrary\steamapps\common\Need for Speed Heat' }),
+  [string]$Frosty  = $(if ($env:FROSTY_EDITOR) { $env:FROSTY_EDITOR }
+                       else { 'F:\SteamLibrary\steamapps\common\NFS Heat Music Modding\FrostyEditor\FrostyEditor' }),
+  [string]$Acervo  = $(if ($env:NFSHEAT_ACERVO) { $env:NFSHEAT_ACERVO } else { 'F:\CarsNfSHeat' }),
+  # O Export.cs nao mora neste repositorio: ele e' do nfs-heat-car-tools, que
+  # e' quem faz a extracao. O padrao procura ao lado deste script; se voce
+  # clonou so' a garagem, aponte com -Export para a copia de la'.
+  [string]$Export  = $(Join-Path $PSScriptRoot 'Export.cs')
 )
 $ErrorActionPreference = 'Stop'
+
+# Falhar aqui, com o caminho na mensagem, e' melhor que falhar la' dentro com
+# um "nao foi possivel carregar o assembly", que nao diz nada a ninguem.
+if (-not (Test-Path (Join-Path $Frosty 'FrostySdk.dll'))) {
+  throw "FrostySdk.dll nao encontrado em '$Frosty'. Defina FROSTY_EDITOR ou use -Frosty."
+}
+if (-not (Test-Path $Jogo))   { throw "Pasta do jogo nao encontrada em '$Jogo'. Defina NFSHEAT_JOGO ou use -Jogo." }
+if (-not (Test-Path $Acervo)) { throw "Acervo nao encontrado em '$Acervo'. Defina NFSHEAT_ACERVO ou use -Acervo." }
+if (-not (Test-Path $Export)) {
+  throw "Export.cs nao encontrado em '$Export'. Ele vem do repositorio nfs-heat-car-tools; aponte com -Export."
+}
 
 Set-Location $Frosty
 [System.IO.Directory]::SetCurrentDirectory($Frosty)
